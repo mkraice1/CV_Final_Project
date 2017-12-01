@@ -8,6 +8,7 @@ x - column direction of image plane
 y - row direction of image plane
 z - depth
 """
+
 def getCentroid(img):
     (row_list, col_list) = np.where(img == 0)
     centroid_row = np.sum(row_list)/(row_list.size)
