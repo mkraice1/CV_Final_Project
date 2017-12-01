@@ -53,7 +53,7 @@ def get_video():
 def find_min_idx(x):
     k = x.argmin()
     ncol = x.shape[1]
-    return (k%ncol, k/ncol), k
+    return (k%ncol, k/ncol), k #(col, row), depth
 
 
 if __name__ == "__main__":
