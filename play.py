@@ -24,8 +24,6 @@ def main():
 
         #radius_hand = 50
         #cv2.circle(depth_frame, closest, radius_hand, (0,255,0), 4)
-        #im2, contours, hierarchy = cv2.findContours(threshold, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-        #depth_image_dist = cv2.distanceTransform(threshold, cv2.DIST_L2, 5)
 
         body_frame = body_coord(depth_frame)
 
