@@ -35,4 +35,4 @@ def plot_vector(img, point1, point2):
     # plot a vector from point2 to point1
     cv2.circle(img, point1, 5, (0,255,0), 4)
     cv2.line(img, point1, point2, (0,255,0),2)
-    return y
+    return img
