@@ -54,6 +54,10 @@ class Body_Net(nn.Module):
 
         return output
 
+############################################
+# In trainer use softmax loss#
+############################################
+
 
 
 
