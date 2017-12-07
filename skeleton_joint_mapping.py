@@ -56,6 +56,10 @@ def points_rotation_compute(left_hip, right_shoulder, left_shoulder, left_elbow,
 
 
 def skeleton_points_generation(shoulder_yaw, shoulder_pitch, shoulder_roll, elbow_pitch, elbow_roll, hand_taw, wrist_yaw):
+    ##############################
+    THIS PART OF CODE STILL NEED TO BE DONE
+    IMPLEMENT DH PARAMETER BASED FORWARD KINEMATICS
+    ##############################
     # define parameters for a virtual arm
     # units are in cm
     shoulders_dist = 30
