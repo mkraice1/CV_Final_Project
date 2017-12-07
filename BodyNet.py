@@ -6,11 +6,11 @@ class BodyNet(nn.Module):
     def __init__(self):
         super(BodyNet, self).__init__()
 
+        self.relu = nn.ReLU()
+        self.dropout = nn.Dropout()
+
         # input data, output conv1
         self.conv1 = nn.Conv2d(1, 64, kernel_size=5, stride=2, padding=5)
-
-        # input conv1, output conv1x
-        self.relu = nn.ReLU()
 
         # input conv1x, output pool1
         self.pool1 = nn.MaxPool2d(kernel_size=3, stride=3)
@@ -18,17 +18,11 @@ class BodyNet(nn.Module):
         # input pool1, output conv2
         self.conv2 = nn.Conv2d(64, 128, kernel_size=3, stride=1)
 
-        # input conv2, output conv2x
-        self.relu2 = nn.ReLU()
-
         # input conv2x, output pool2
         self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
 
         # input pool2, output conv3
         self.conv3 = nn.Conv2d(128, 256, kernel_size=5, stride=1)
-
-        # input conv3, output conv3x
-        self.relu3 = nn.ReLU(inplace=True)
 
         # input conv3x, output conv4_class (conv)
         self.conv4_class = nn.Conv2d(256, 44, kernel_size=3, stride=1)
@@ -52,19 +46,17 @@ class BodyNet(nn.Module):
         # input score, output prob (SoftMax)
         self.prob = nn.Softmax()
 
-        self.dropout = nn.Dropout()
-
 
 
     def forward(self, data):
-        conv1   = self.conv1(data)
-        conv1x  = self.relu(conv1)
-        pool1   = self.pool1(conv1x)
-        conv2   = self.conv2(pool1)
-        conv2x  = self.relu(conv2)
-        pool2   = self.pool2(conv2x)
-        conv3   = self.conv3(pool2)
-        conv3x  = self.relu(conv3)
+        conv1 = self.conv1(data)
+        conv1x = self.relu(conv1)
+        pool1 = self.pool1(conv1x)
+        conv2 = self.conv2(pool1)
+        conv2x = self.relu(conv2)
+        pool2 = self.pool2(conv2x)
+        conv3 = self.conv3(pool2)
+        conv3x = self.relu(conv3)
         conv4_class = self.conv4_class(conv3x)
         upscore = self.upscore(conv4_class)
 
