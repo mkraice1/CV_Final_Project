@@ -5,7 +5,8 @@ import frame_convert2
 import numpy as np
 from body_coord import body_coord, position_3D, plot_vector
 # some change
-#kmnfwkonfhjjhww
+# test:ethan2
+
 
 cv2.namedWindow('Depth')
 
@@ -20,22 +21,29 @@ def main():
         #only works to about 90
 
         hand_position = find_min_idx(depth_frame)
-        hand_depth = depth_frame[hand_position[0], hand_position[1]]
+        #print hand_position
+        hand_depth = depth_frame[hand_position[0]][hand_position[1]]
+        #print hand_depth
 
-        #radius_hand = 50
-        #cv2.circle(depth_frame, closest, radius_hand, (0,255,0), 4)
-        #im2, contours, hierarchy = cv2.findContours(threshold, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-        #depth_image_dist = cv2.distanceTransform(threshold, cv2.DIST_L2, 5)
+        # segment the hand out
+        hand_depth_thresh = 20
+        hand_area = np.where(np.logical_and(depth_frame <= (hand_depth + hand_depth_thresh), depth_frame >= hand_depth_thresh))
+
+        # detemine hand state (open = 1, close = 0), based on a threshold value
+        hand_area_thresh = 250000
+        hand_area = hand_area[0]
+        hand_area = hand_area.size
+        print hand_area
+
+        hand_state = 0
+        if hand_area >= hand_area_thresh:
+            hand_state = 1
 
         body_frame = body_coord(depth_frame)
-
-        #radius_body = 10
-        #cv2.circle(depth_frame, (body_coord_row, body_coord_col), radius_body, (255,0,0),4)
-        #cv2.imshow('Depth', depth_frame)
-
         hand_position_3D = position_3D(hand_position, hand_depth, body_frame)
+        output_message = merge_info(hand_position_3D, hand_state)
         # make this a ros topic for baxter to receive, scale z (depth) into a suitable value, current scale is 500
-        print hand_position_3D
+        print output_message
 
         color_frame_vector = plot_vector(color_frame, hand_position, body_frame)
         cv2.imshow('body frame', color_frame_vector)
@@ -55,6 +63,9 @@ def find_min_idx(x):
     ncol = x.shape[1]
     return (k%ncol, k/ncol)
 
+def merge_info(hand_position_3D, hand_state):
+    output_message = np.array([hand_position_3D[0],hand_position_3D[1],hand_position_3D[2],hand_state])
+    return output_message
 
 if __name__ == "__main__":
     main()
