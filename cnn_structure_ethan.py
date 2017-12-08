@@ -6,7 +6,7 @@ import torch.nn as nn
 import random
 import torch.nn.functional as F
 import torchvision.datasets as dset
-import torchvision.transform as transforms
+import torchvision.transforms as transforms
 import torchvision.utils as utils
 import numpy as np
 from torch.autograd import Variable
@@ -54,7 +54,7 @@ class BodyPoseSet(Dataset):
 class Body_Net(nn.Module):
     def __init__(self):
         super(Body_Net, self).__init__()
-        self.conv1 = nn.Conv2d(1, 64, kernel_size=5, stride=2, padding=2)
+        self.conv1 = nn.Conv2d(1, 64, kernel_size=5, stride=2, padding=5)
         self.relu1 = nn.ReLU()
         self.pool1 = nn.MaxPool2d(kernel_size=3, stride=3)
         self.conv2 = nn.Conv2d(64, 128, kernel_size=3, stride=1)
@@ -104,9 +104,9 @@ class Body_Net(nn.Module):
 
         return output
 
-    def bodynet(pretrained=False, **kwargs):
-        model = BodyNet(**kwargs)
-        return model
+    #def bodynet(pretrained=False, **kwargs):
+        #model = Body_Net(**kwargs)
+        #return model
 
 ############################################
 
