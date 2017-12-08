@@ -54,7 +54,7 @@ class BodyPoseSet(Dataset):
 class Body_Net(nn.Module):
     def __init__(self):
         super(Body_Net, self).__init__()
-        self.conv1 = nn.Conv2d(1, 64, kernel_size=5, stride=2, padding=5)
+        self.conv1 = nn.Conv2d(1, 64, kernel_size=5, stride=2, padding=2)
         self.relu1 = nn.ReLU()
         self.pool1 = nn.MaxPool2d(kernel_size=3, stride=3)
         self.conv2 = nn.Conv2d(64, 128, kernel_size=3, stride=1)
