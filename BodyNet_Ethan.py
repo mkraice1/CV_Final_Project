@@ -6,7 +6,7 @@ import torch.nn as nn
 import random
 import torch.nn.functional as F
 import torchvision.datasets as dset
-import torchvision.transform as transforms
+import torchvision.transforms as transforms
 import torchvision.utils as utils
 import numpy as np
 from torch.autograd import Variable
@@ -104,9 +104,9 @@ class Body_Net(nn.Module):
 
         return output
 
-    def bodynet(pretrained=False, **kwargs):
-        model = BodyNet(**kwargs)
-        return model
+    #def bodynet(pretrained=False, **kwargs):
+        #model = Body_Net(**kwargs)
+        #return model
 
 ############################################
 
