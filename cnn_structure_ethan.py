@@ -50,7 +50,7 @@ class BodyPoseSet(Dataset):
         return all_imgs, all_labels
 ######################################
 
-#########NET WORK STRUCTURE###########
+#########NET WORK STRUCTURE###cc########
 class Body_Net(nn.Module):
     def __init__(self):
         super(Body_Net, self).__init__()
