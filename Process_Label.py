@@ -79,5 +79,7 @@ def color_to_classes(img):
 img = Image.open('./easy-pose/train/1/images/groundtruth/Cam1/mayaProject.000002.png')
 output = color_to_classes(img)
 print np.shape(output)
+
+##########could be changed#############
 #plt.imshow(output, cmap='gray')
 #plt.show()
