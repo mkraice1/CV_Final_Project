@@ -54,27 +54,32 @@ color_map = np.array((
 def color_to_classes(img):
     lenx, leny = img.size
     n_classes = len(color_map)
-
     img_np = np.array(img)
+
     # Get the alpha channel
     alpha = img_np[:, :, 3]
+
+    # make alpha channel into a boolean array
+    alpha = np.equal(alpha, np.ones((leny, lenx))*255)
 
     # img_np = np.array(img.convert('RGB'))
     R = img_np[:, :, 0]
     G = img_np[:, :, 1]
     B = img_np[:, :, 2]
-    class_frame = np.empty((leny, lenx))
+    class_frame = np.empty((44, leny, lenx))
     for i in range(n_classes):
         result = np.logical_and(alpha, np.logical_and(
             np.logical_and((abs(R - color_map[i, 0]) < 3), (abs(G - color_map[i, 1]) < 3)),
             (abs(B - color_map[i, 2]) < 3)))
-        class_frame[result] = i+1
+        class_frame[[i]] = result
 
 
     return class_frame
 
 img = Image.open('./easy-pose/train/1/images/groundtruth/Cam1/mayaProject.000002.png')
 output = color_to_classes(img)
-print np.unique(output)
+print np.shape(output)
+
+##########could be changed#############
 #plt.imshow(output, cmap='gray')
 #plt.show()
