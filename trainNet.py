@@ -13,15 +13,20 @@ from torch.autograd import Variable
 from torch import optim                              
 from torch.utils.data import Dataset, DataLoader
 from PIL import Image
-######################################
 
+########## MAIN DRIVER PROGRAM ############
 def main():
-    data = BodyPoseSet()
+    trans = transforms.Compose([
+        transforms.Resize((250,250)),
+        transforms.ToTensor(),
+    ])
+    data = BodyPoseSet(transform = trans)
     sample_tuple = data[0]
     input_test = sample_tuple['img']
     input_test = input_test.unsqueeze(0)
     net = Body_Net()
     output_test = net(Variable(input_test))
+    
 
 #########DATA LOADER##################
 class BodyPoseSet(Dataset):
@@ -42,16 +47,7 @@ class BodyPoseSet(Dataset):
         label_path = os.path.join(self.root_dir, label_name)
         img = Image.open(img_path).convert('L')
         label = Image.open(label_path)
-
-        # Transform to tensor
-        trans = transforms.Compose([
-            transforms.Resize((250,250)),
-            transforms.ToTensor(),
-        ])
-        img = trans(img)
-        label = trans(label)
-
-        # Extra transformation
+        
         if self.transform is not None:
             img = self.transform(img)
             label = self.transform(label)
@@ -74,6 +70,7 @@ class BodyPoseSet(Dataset):
         return all_imgs, all_labels
 
 
+
 #########NET WORK STRUCTURE###########
 class Body_Net(nn.Module):
     def __init__(self):
@@ -93,6 +90,7 @@ class Body_Net(nn.Module):
         self.upscore2 = nn.ConvTranspose2d(44, 44, kernel_size=4, stride=2, bias=False)
         self.score_pool1 = nn.Conv2d(64, 44, kernel_size=1, stride=1)
         self.upscore3 = nn.ConvTranspose2d(44, 44, kernel_size=19, stride=7, bias=False)
+        self.prob = nn.Softmax2d()
 
     def forward(self, data):
         h = data
@@ -125,7 +123,9 @@ class Body_Net(nn.Module):
         h = upscore2 + score_pool1
         h = self.dropout(h)
         output = self.upscore3(h)
-
+        # compute cross entropy 
+        output = self.prob(output)
+        output = -torch.log(output)
         return output
 
 if __name__ == "__main__":
