@@ -38,7 +38,7 @@ def main():
     # Training process setup
    # Training process setup
     img_trans = transforms.Compose([transforms.Resize((250,250)),transforms.ToTensor()])
-    label_trans = transforms.Compose([transforms.Resize((250,250))])
+    label_trans = transforms.Compose([transforms.ToTensor()])
     body_train = BodyPoseSet(img_transform=img_trans, label_transform = label_trans)
     train_loader = DataLoader(body_train, batch_size=configs['batch_train'], shuffle=True, num_workers=configs['num_workers'])
 
@@ -61,8 +61,8 @@ def main():
             loss.backward()
             optimizer.step()
 
-            if batch_idx % (len(face_train)/configs['batch_train']/5) == 0:
-                print "Epoch %d, Batch %d Loss %f" % (epoch, batch_idx, loss.data[0])
+            if batch_idx % (len(body_train)/configs['batch_train']/5) == 0:
+                print ("Epoch %d, Batch %d Loss %f" % (epoch, batch_idx, loss.data[0]))
                 iteration += 20
                 counter.append(iteration)
                 loss_history.append(loss.data[0])
@@ -94,7 +94,8 @@ class BodyPoseSet(Dataset):
         label_path = os.path.join(self.root_dir, label_name)
         img = Image.open(img_path).convert('L')
         label = Image.open(label_path)
-        label = torch.from_numpy(color_to_classes(label))
+        label = color_to_classes(label)
+
         
         if self.img_transform is not None:
             img = self.img_transform(img)
