@@ -1,14 +1,16 @@
 #########LOAD LIBRARIES###############               
 import torch                                         
 import os                                            
-import cv2                                           
+import cv2
+import argparse                                           
 import torch.nn as nn                                
 import random                                        
 import torch.nn.functional as F                      
 import torchvision.datasets as dset                  
 import torchvision.transforms as transforms           
 import torchvision.utils as utils                    
-import numpy as np                                   
+import numpy as np
+import pickle                                   
 from torch.autograd import Variable                  
 from torch import optim                              
 from torch.utils.data import Dataset, DataLoader
@@ -16,16 +18,56 @@ from PIL import Image
 
 ########## MAIN DRIVER PROGRAM ############
 def main():
-    trans = transforms.Compose([
-        transforms.Resize((250,250)),
-        transforms.ToTensor(),
-    ])
-    data = BodyPoseSet(transform = trans)
-    sample_tuple = data[0]
-    input_test = sample_tuple['img']
-    input_test = input_test.unsqueeze(0)
-    net = Body_Net()
-    output_test = net(Variable(input_test))
+    parser = argparse.ArgumentParser(description='Body pose recognition.')
+    parser.add_argument('--load', type = str, help = 'Using trained parameter to test on both train and test sets.')
+    parser.add_argument('--save', type = str, help = 'Train the model using splitting file provided.')
+    args = parser.parse_args()
+    weights_dir = args.save
+
+    # Setting up configuration
+    configs = {"batch_train": 16, \
+                "batch_test": 4, \
+                "epochs": 30, \
+                "num_workers": 4, \
+                "learning_rate": 1e-6, \
+                "data_augment": True}
+
+    # Training process setup
+    data_trans = transforms.Compose([transforms.Resize((250,250)),transforms.ToTensor()])
+    face_train = BodyPoseSet(transform=data_trans)
+    train_loader = DataLoader(face_train, batch_size=configs['batch_train'], shuffle=True, num_workers=configs['num_workers'])
+
+    # Training the net
+    net = Body_Net().cuda()
+    optimizer = optim.Adam(net.parameters(), lr = configs['learning_rate'])
+    total_epoch = configs['epochs']
+    counter = []
+    loss_history = []
+    iteration = 0 
+    loss_fn = nn.BCELoss() ####################### needs to be changed!!!
+
+    for epoch in range(total_epoch):
+        for batch_idx, batch_sample in enumerate(train_loader):
+            img = batch_sample['img']
+            label = batch_sample['label']
+            img1, y = Variable(img).cuda(), Variable(label).cuda()
+            optimizer.zero_grad()
+            y_pred = net(img)
+            loss = loss_fn(y_pred, y)
+            loss.backward()
+            optimizer.step()
+
+            if batch_idx % (len(face_train)/configs['batch_train']/5) == 0:
+                print "Epoch %d, Batch %d Loss %f" % (epoch, batch_idx, loss.data[0])
+                iteration += 20
+                counter.append(iteration)
+                loss_history.append(loss.data[0])
+        
+    # Save the trained network
+    torch.save(net.state_dict(), weights_dir)
+    total_hist = [counter, loss_history]
+    with open("training_history.txt", "wb") as fp:
+        pickle.dump(total_hist, fp)
     
 
 #########DATA LOADER##################
