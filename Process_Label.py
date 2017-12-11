@@ -74,9 +74,10 @@ def color_to_classes(img):
             (abs(B - color_map[i, 2]) < 3)))
         result = cv2.resize(result.astype(np.uint8), (250, 250))
         class_frame[[i]] = result
+    class_frame = np.swapaxes(class_frame,0,2)
 
     # class_frame = Image.fromarray(class_frame.astype('uint8'), 'RGB')
-    return class_frame
+    return np.swapaxes(class_frame,0,2)
 
 
 ##########could be changed#############

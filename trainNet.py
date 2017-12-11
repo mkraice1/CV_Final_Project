@@ -57,6 +57,7 @@ def main():
             img1, y = Variable(img).cuda(), Variable(label).cuda()
             optimizer.zero_grad()
             y_pred = net(img1)
+
             loss = Cross_Entropy_Loss(y_pred, y)
             loss.backward()
             optimizer.step()
