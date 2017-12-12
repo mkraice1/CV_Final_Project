@@ -60,9 +60,6 @@ def color_to_classes(img):
     # Get the alpha channel
     alpha = (img_np[:, :, 3] == 255)
 
-    # make alpha channel into a boolean array
-    # alpha = np.equal(alpha, np.ones((leny, lenx))*255)
-
     img_np = np.array(img.convert('RGB'))
     R = img_np[:, :, 0].astype(int)
     G = img_np[:, :, 1].astype(int)
@@ -72,8 +69,6 @@ def color_to_classes(img):
         result = np.logical_and(alpha, np.logical_and(
             np.logical_and((abs(R - color_map[i, 0]) < 3), (abs(G - color_map[i, 1]) < 3)),
             (abs(B - color_map[i, 2]) < 3)))
-        #result = cv2.resize(result.astype(np.uint8), (250, 250))
-        #class_frame[:,:,i] = result
         class_frame[result] = i+1
 
     # class_frame = Image.fromarray(class_frame.astype('uint8'), 'RGB')
@@ -83,11 +78,7 @@ def color_to_classes(img):
 
 ##########could be changed#############
 #img = Image.open('./easy-pose/train/1/images/groundtruth/Cam1/mayaProject.000002.png')
-#print np.shape(np.array(img))
 #output = color_to_classes(img)
 #print np.unique(output)
-#print np.unique(output)
-#output = np.resize(output[[4]], (250,250))
 #plt.imshow(output)
-#print np.unique(output)
 #plt.show()
