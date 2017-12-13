@@ -177,8 +177,8 @@ class Body_Net(nn.Module):
         h = self.dropout(h)
         output = self.upscore3(h)
         # compute cross entropy 
-        output = self.prob(output)
-        output = -torch.log(output)
+        # output = self.prob(output)
+        # output = -torch.log(output)
         return output
 
 class Cross_Entropy_Loss(nn.Module):
