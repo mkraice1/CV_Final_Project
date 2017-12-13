@@ -67,18 +67,20 @@ def color_to_classes(img):
     R = img_np[:, :, 0].astype(int)
     G = img_np[:, :, 1].astype(int)
     B = img_np[:, :, 2].astype(int)
-    class_frame = np.empty((44, 250, 250), dtype = np.uint8)
+    class_frame = np.zeros((leny, lenx))
     for i in range(n_classes):
         result = np.logical_and(alpha, np.logical_and(
             np.logical_and((abs(R - color_map[i, 0]) < 3), (abs(G - color_map[i, 1]) < 3)),
             (abs(B - color_map[i, 2]) < 3)))
-        result = cv2.resize(result.astype(np.uint8), (250, 250))
-        class_frame[[i]] = result
-    class_frame = np.swapaxes(class_frame,0,2)
+        class_frame[result] = i+1
 
+    class_frame = cv2.resize(class_frame.astype(np.uint8),(250,250))
+    class_frame = Image.fromarray(class_frame)
+
+    #class_frame = np.swapaxes(class_frame,0,2)
     # class_frame = Image.fromarray(class_frame.astype('uint8'), 'RGB')
-    return np.swapaxes(class_frame,0,2)
-
+    #return np.swapaxes(class_frame,1,2)
+    return class_frame
 
 ##########could be changed#############
 #img = Image.open('./easy-pose/train/1/images/groundtruth/Cam1/mayaProject.000002.png')

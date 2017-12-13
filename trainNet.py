@@ -1,4 +1,4 @@
-#########LOAD LIBRARIES###############
+###########LOAD LIBRARIES###############
 #########PUBLIC LIBRARIES#############
 import torch                                         
 import os                                            
@@ -30,12 +30,11 @@ def main():
     # Setting up configuration
     configs = {"batch_train": 16, \
                 "batch_test": 4, \
-                "epochs": 30, \
+                "epochs": 2, \
                 "num_workers": 4, \
                 "learning_rate": 1e-6, \
                 "data_augment": True}
 
-    # Training process setup
    # Training process setup
     img_trans = transforms.Compose([transforms.Resize((250,250)),transforms.ToTensor()])
     label_trans = transforms.Compose([transforms.ToTensor()])
@@ -62,7 +61,7 @@ def main():
             loss.backward()
             optimizer.step()
 
-            if batch_idx % (len(body_train)/configs['batch_train']/5) == 0:
+            if batch_idx % (len(body_train)/configs['batch_train']/500) == 0:
                 print ("Epoch %d, Batch %d Loss %f" % (epoch, batch_idx, loss.data[0]))
                 iteration += 20
                 counter.append(iteration)
@@ -75,7 +74,7 @@ def main():
         pickle.dump(total_hist, fp)
     
 
-#########DATA LOADER##################
+#########DATASET CLASS##################
 class BodyPoseSet(Dataset):
     """Body pose dataset"""
     def __init__(self, root_dir='./', mode='train', img_transform=None, label_transform=None):
@@ -111,7 +110,9 @@ class BodyPoseSet(Dataset):
         all_imgs = []
         all_labels = []
         for a in ['easy-pose']:
-            for b in [i+1 for i in range(1)]:
+            for b in [i+1 for i in range(35)]:
+                #if b == 36 or b == 106 or b == 178 or b == 72:
+                    #continue
                 for c in ['Cam1','Cam2','Cam3']:
                     for d in ["{0:04}".format(i+1) for i in range(1001)]:
                         img_name = "%s/%s/%d/images/depthRender/%s/mayaProject.00%s.png" %(a,self.mode,b,c,d)
@@ -180,14 +181,26 @@ class Body_Net(nn.Module):
         return output
 
 
-def Cross_Entropy_Loss(y_pred, y):
-    loss = torch.sum(torch.mul(y_pred,y))
+def Cross_Entropy_Loss(y_pred, y, weight=None, size_average=True):
+    """
+    y_pred: 16(b) by 44(c) by 250(h) by 250(w)
+    y: 16(b) by 250(h) by 250(w)
+    """
+    n, c, h, w = y_pred.size()
+    log_p = F.log_softmax(y_pred)
+    log_p = log_p.transpose(1,2).transpose(2,3).contiguous().view(-1,c)
+    log_p = log_p[y.view(n,h,w,1).repeat(1,1,1,c)>=0]
+    log_p = log_p.view(-1,c)
+    mask = y >= 0
+    y = y[mask]
+    loss = F.nll_loss(log_p, y.type(torch.cuda.LongTensor), weight=weight, size_average=False)
+    if size_average:
+        loss /= mask.data.sum()
     return loss
-
 
 if __name__ == "__main__":
     main()
-
+###END OF PROGRAM###
 
 
 
