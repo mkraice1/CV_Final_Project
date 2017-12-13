@@ -48,6 +48,7 @@ def main():
     counter = []
     loss_history = []
     iteration = 0 
+    loss_fn = Cross_Entropy_Loss()
 
     for epoch in range(total_epoch):
         for batch_idx, batch_sample in enumerate(train_loader):
@@ -57,7 +58,7 @@ def main():
             optimizer.zero_grad()
             y_pred = net(img1)
 
-            loss = Cross_Entropy_Loss(y_pred, y)
+            loss = loss_fn(y_pred, y)
             loss.backward()
             optimizer.step()
 
@@ -180,23 +181,30 @@ class Body_Net(nn.Module):
         output = -torch.log(output)
         return output
 
+class Cross_Entropy_Loss(nn.Module):
 
-def Cross_Entropy_Loss(y_pred, y, weight=None, size_average=True):
-    """
-    y_pred: 16(b) by 44(c) by 250(h) by 250(w)
-    y: 16(b) by 250(h) by 250(w)
-    """
-    n, c, h, w = y_pred.size()
-    log_p = F.log_softmax(y_pred)
-    log_p = log_p.transpose(1,2).transpose(2,3).contiguous().view(-1,c)
-    log_p = log_p[y.view(n,h,w,1).repeat(1,1,1,c)>=0]
-    log_p = log_p.view(-1,c)
-    mask = y >= 0
-    y = y[mask]
-    loss = F.nll_loss(log_p, y.type(torch.cuda.LongTensor), weight=weight, size_average=False)
-    if size_average:
-        loss /= mask.data.sum()
-    return loss
+    def __init__(self, weight=None, size_average=True):
+        super(Cross_Entropy_Loss, self).__init__()
+        self.weight = weight
+        self.size_average = size_average
+
+    def forward(self, y_pred, y):
+        """
+        y_pred: 16(b) by 44(c) by 250(h) by 250(w)
+        y: 16(b) by 250(h) by 250(w)
+        """
+        n, c, h, w = y_pred.size()
+        log_p = F.log_softmax(y_pred)
+        log_p = log_p.transpose(1,2).transpose(2,3).contiguous().view(-1,c)
+        log_p = log_p[y.view(n,h,w,1).repeat(1,1,1,c)>=0]
+        log_p = log_p.view(-1,c)
+        mask = y >= 0
+        y = y[mask]
+        loss = F.nll_loss(log_p, y.type(torch.cuda.LongTensor), weight=self.weight, size_average=False)
+        if self.size_average:
+            loss /= mask.data.sum()
+        
+        return loss
 
 if __name__ == "__main__":
     main()
