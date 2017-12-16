@@ -73,12 +73,13 @@ def color_to_classes(img):
 
     # class_frame = Image.fromarray(class_frame.astype('uint8'), 'RGB')
     class_frame = cv2.resize(class_frame.astype(np.uint8),(250,250))
+    class_frame = Image.fromarray(class_frame)
     return class_frame
 
 
 ##########could be changed#############
-#img = Image.open('./easy-pose/train/1/images/groundtruth/Cam1/mayaProject.000002.png')
-#output = color_to_classes(img)
-#print np.unique(output)
-#plt.imshow(output)
-#plt.show()
+img = Image.open('./easy-pose/train/1/images/groundtruth/Cam1/mayaProject.000002.png')
+output = color_to_classes(img)
+print np.unique(output)
+plt.imshow(output)
+plt.show()
