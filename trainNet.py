@@ -48,13 +48,16 @@ def main():
     counter = []
     loss_history = []
     iteration = 0 
-    loss_fn = Cross_Entropy_Loss()
+#    loss_fn = Cross_Entropy_Loss()
+    loss_fn = nn.NLLLoss2d()
 
     for epoch in range(total_epoch):
         for batch_idx, batch_sample in enumerate(train_loader):
             img = batch_sample['img']
-            label = batch_sample['label']
+            label = batch_sample['label'].long()
             img1, y = Variable(img).cuda(), Variable(label).cuda()
+            print label.size()
+
             optimizer.zero_grad()
             y_pred = net(img1)
 
@@ -143,7 +146,7 @@ class Body_Net(nn.Module):
         self.upscore2 = nn.ConvTranspose2d(44, 44, kernel_size=4, stride=2, bias=False)
         self.score_pool1 = nn.Conv2d(64, 44, kernel_size=1, stride=1)
         self.upscore3 = nn.ConvTranspose2d(44, 44, kernel_size=19, stride=7, bias=False)
-        self.prob = nn.Softmax2d()
+        self.prob = nn.LogSoftmax(dim=1)
 
     def forward(self, data):
         h = data
@@ -177,8 +180,7 @@ class Body_Net(nn.Module):
         h = self.dropout(h)
         output = self.upscore3(h)
         # compute cross entropy 
-        # output = self.prob(output)
-        # output = -torch.log(output)
+        output = self.prob(output)
         return output
 
 class Cross_Entropy_Loss(nn.Module):
@@ -191,7 +193,7 @@ class Cross_Entropy_Loss(nn.Module):
     def forward(self, y_pred, y):
         """
         y_pred: 16(b) by 44(c) by 250(h) by 250(w)
-        y: 16(b) by 250(h) by 250(w)
+        y: 16(b) by 44(c) 250(h) by 250(w)
         """
         n, c, h, w = y_pred.size()
         log_p = F.log_softmax(y_pred)
