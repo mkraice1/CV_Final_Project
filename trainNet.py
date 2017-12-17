@@ -37,7 +37,7 @@ def main():
 
    # Training process setup
     img_trans = transforms.Compose([transforms.Resize((250,250)),transforms.ToTensor()])
-    label_trans = transforms.Compose([transforms.ToTensor()])
+    label_trans = transforms.Compose([])
     body_train = BodyPoseSet(img_transform=img_trans, label_transform = label_trans)
     train_loader = DataLoader(body_train, batch_size=configs['batch_train'], shuffle=True, num_workers=configs['num_workers'])
 
@@ -56,7 +56,6 @@ def main():
             img = batch_sample['img']
             label = batch_sample['label'].long()
             img1, y = Variable(img).cuda(), Variable(label).cuda()
-            print label.size()
 
             optimizer.zero_grad()
             y_pred = net(img1)
@@ -98,7 +97,7 @@ class BodyPoseSet(Dataset):
         label_path = os.path.join(self.root_dir, label_name)
         img = Image.open(img_path).convert('L')
         label = Image.open(label_path)
-        label = color_to_classes(label)
+        label = torch.LongTensor(color_to_classes(label))
 
         
         if self.img_transform is not None:
