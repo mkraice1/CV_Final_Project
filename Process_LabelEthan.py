@@ -1,7 +1,7 @@
 from PIL import Image
 import numpy as np
 import cv2
-from matplotlib import pyplot as plt
+#from matplotlib import pyplot as plt
 
 color_map = np.array((
     (255, 106, 0),

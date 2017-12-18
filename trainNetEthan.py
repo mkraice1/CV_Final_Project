@@ -28,11 +28,11 @@ def main():
     weights_dir = args.save
 
     # Setting up configuration
-    configs = {"batch_train": 16, \
+    configs = {"batch_train": 8, \
                 "batch_test": 4, \
-                "epochs": 15, \
+                "epochs": 5, \
                 "num_workers": 4, \
-                "learning_rate": 1e-6, \
+                "learning_rate": 1e-4, \
                 "data_augment": True}
 
    # Training process setup
