@@ -55,8 +55,11 @@ def main():
         for batch_idx, batch_sample in enumerate(train_loader):
             img = batch_sample['img']
             label = batch_sample['label'].long()
-            img1, y = Variable(img).cuda(), Variable(label).cuda()
-
+	    img1, y = Variable(img).cuda(), Variable(label).cuda()
+	    
+            np_label = label.numpy()
+            
+               
             optimizer.zero_grad()
             y_pred = net(img1)
 

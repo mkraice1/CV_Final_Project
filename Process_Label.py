@@ -55,6 +55,7 @@ color_map = np.array((
 def color_to_classes(img):
     #lenx, leny = img.size
     n_classes = len(color_map)
+    img = img.resize((250,250))
     img_np = np.array(img)
 
     # Get the alpha channel
@@ -72,8 +73,8 @@ def color_to_classes(img):
         result = np.logical_and(alpha, np.logical_and(
             np.logical_and((abs(R - color_map[i, 0]) < 3), (abs(G - color_map[i, 1]) < 3)),
             (abs(B - color_map[i, 2]) < 3)))
-        result = cv2.resize(result.astype(np.uint8), (250,250))
-        class_frame[result] = i+1
+        
+	class_frame[result] = i+1
 
     #class_frame = cv2.resize(class_frame.astype(np.uint8),(250,250))
     #class_frame = Image.fromarray(class_frame)
